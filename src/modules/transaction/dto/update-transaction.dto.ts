@@ -1,10 +1,10 @@
 // update-transaction.dto.ts
 import { Transform } from 'class-transformer';
-import { IsDateString, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsISO8601, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UpdateTransactionDto {
     @Transform(({ value }) => new Date(value))
-    @IsDateString()
+    // @IsISO8601()
     date?: Date;
 
     @IsOptional()

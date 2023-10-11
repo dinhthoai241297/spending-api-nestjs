@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { instanceToInstance, instanceToPlain, plainToClass, plainToInstance } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
 import { paginationData } from 'src/utils';
 import { Between, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
@@ -56,16 +56,16 @@ export class TransactionService {
     async update(id: number, updateTransactionDto: UpdateTransactionDto): Promise<Transaction> {
         const transaction = await this.transactionRepository.findOne({ where: { id } });
 
-
         if (!transaction) {
             throw new NotFoundException('Transaction not found');
         }
 
-        const formInstance = plainToInstance(UpdateTransactionDto, updateTransactionDto);
-        const updatedTransaction = plainToInstance(Transaction, formInstance);
-        updatedTransaction.id = transaction.id;
+        const transactionUpdate = plainToInstance(Transaction, {
+            ...transaction,
+            ...updateTransactionDto,
+        });
 
-        return await this.transactionRepository.save(updatedTransaction);
+        return await this.transactionRepository.save(transactionUpdate);
     }
 
     async remove(id: number): Promise<void> {

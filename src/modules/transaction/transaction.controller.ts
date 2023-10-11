@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApiMessagedto } from 'src/dto/api-message.dto';
 import { BaseController } from '../base.controller';
@@ -66,6 +66,7 @@ export class TransactionController extends BaseController {
     @ApiBody({
         type: UpdateTransactionDto,
     })
+    @UsePipes(ValidationPipe)
     async update(@Param('id') id: string, @Body() updateTransactionDto: UpdateTransactionDto): Promise<Transaction> {
         return await this.transactionService.update(Number(id), updateTransactionDto);
     }
