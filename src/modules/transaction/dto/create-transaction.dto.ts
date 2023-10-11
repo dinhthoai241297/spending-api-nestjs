@@ -1,8 +1,11 @@
-import { IsDate, IsNumber, IsString } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsDateString, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { MoneyMovement, TransactionPeriod, TransactionType } from 'src/constants';
 
 export class CreateTransactionDto {
-    @IsDate()
+    @IsNotEmpty()
+    @Transform(({ value }) => new Date(value))
+    @IsDateString()
     date: Date;
 
     @IsString()
@@ -12,7 +15,8 @@ export class CreateTransactionDto {
     amount: number;
 
     @IsNumber()
-    category: number;
+    @IsNotEmpty()
+    categoryId: number;
 
     @IsString()
     money_movement: string;

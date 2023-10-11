@@ -1,11 +1,10 @@
 // update-transaction.dto.ts
-import { IsDate, IsNumber, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
+import { IsDateString, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UpdateTransactionDto {
-    @IsOptional() // Cho phép thiếu các trường
-    @IsDate()
-    @Transform(({ value }) => new Date(value)) // Biến đổi dữ liệu thành kiểu Date
+    @Transform(({ value }) => new Date(value))
+    @IsDateString()
     date?: Date;
 
     @IsOptional()

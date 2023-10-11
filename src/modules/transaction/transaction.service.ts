@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { plainToClass } from 'class-transformer';
+import { instanceToInstance, instanceToPlain, plainToClass, plainToInstance } from 'class-transformer';
 import { paginationData } from 'src/utils';
-import { Between, MoreThanOrEqual, LessThanOrEqual, Repository } from 'typeorm';
+import { Between, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { Transaction } from './entities/transaction.entity';
@@ -61,12 +61,10 @@ export class TransactionService {
             throw new NotFoundException('Transaction not found');
         }
 
-        // Sử dụng plainToClass để ánh xạ dữ liệu từ DTO vào Entity
-        const updatedTransaction = plainToClass(Transaction, updateTransactionDto, {
-            excludeExtraneousValues: true, // Loại bỏ các giá trị không cần thiết
-        });
+        const formInstance = plainToInstance(UpdateTransactionDto, updateTransactionDto);
+        const updatedTransaction = plainToInstance(Transaction, formInstance);
+        updatedTransaction.id = transaction.id;
 
-        // Lưu giao dịch đã cập nhật vào cơ sở dữ liệu
         return await this.transactionRepository.save(updatedTransaction);
     }
 

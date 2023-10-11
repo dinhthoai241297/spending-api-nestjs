@@ -1,5 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiMessagedto } from 'src/dto/api-message.dto';
+import { BaseController } from '../base.controller';
 import { CreateTransactionDto, createTransactionDtoExample } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { Transaction } from './entities/transaction.entity';
@@ -7,8 +9,8 @@ import { TransactionService } from './transaction.service';
 
 @Controller('transactions')
 @ApiTags('transactions')
-export class TransactionController {
-    constructor(private readonly transactionService: TransactionService) { }
+export class TransactionController extends BaseController {
+    constructor(private readonly transactionService: TransactionService) { super() }
 
     @Post()
     @ApiOperation({ summary: 'Create a new transaction' })
@@ -39,7 +41,7 @@ export class TransactionController {
         @Query('tx_type') txType?: string,
         @Query('page') page = 0,
         @Query('size') size = 12,
-    ): Promise<{ content: Transaction[], total: number }> {
+    ): Promise<ApiMessagedto<Transaction>> {
         const [ content, total ] = await this.transactionService.findAll({
             startDate,
             endDate,
@@ -50,12 +52,12 @@ export class TransactionController {
             size,
         });
 
-        return { content, total };
+        return this.makeResponse('Get list transaction success!', content);
     }
 
     @Get(':id')
-    async findOne(@Param('id') id: string): Promise<Transaction> {
-        return await this.transactionService.findOne(Number(id));
+    async findOne(@Param('id') id: string): Promise<ApiMessagedto<Transaction>> {
+        return this.makeResponse('', await this.transactionService.findOne(Number(id)));
     }
 
     @Put(':id')
