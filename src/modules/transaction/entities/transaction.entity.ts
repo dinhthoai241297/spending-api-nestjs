@@ -15,8 +15,8 @@ export class Transaction {
     @Column({ type: 'float' })
     amount: number;
 
-    @Column({ type: 'varchar', length: 255 })
-    note: string;
+    @Column({ type: 'varchar', length: 255, nullable: true })
+    note?: string;
 
     @ManyToOne(type => Category, { nullable: false })
     @JoinColumn({ name: 'category_id' })

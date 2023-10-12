@@ -54,7 +54,7 @@ export class TransactionService {
     }
 
     async findOne(id: number): Promise<Transaction> {
-        return await this.transactionRepository.findOne({ where: { id } });
+        return await this.transactionRepository.findOne({ where: { id }, relations: [ 'category' ] });
     }
 
     async update(id: number, updateTransactionDto: UpdateTransactionDto): Promise<Transaction> {

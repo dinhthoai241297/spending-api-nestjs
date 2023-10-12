@@ -1,10 +1,11 @@
 // update-transaction.dto.ts
 import { Transform } from 'class-transformer';
-import { IsISO8601, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsDate, IsDefined, IsNumber, IsOptional, IsString } from 'class-validator';
+import { Category } from 'src/modules/category/entities/category.entity';
 
 export class UpdateTransactionDto {
     @Transform(({ value }) => new Date(value))
-    // @IsISO8601()
+    @IsDate()
     date?: Date;
 
     @IsOptional()
@@ -15,9 +16,9 @@ export class UpdateTransactionDto {
     @IsNumber()
     amount?: number;
 
-    @IsOptional()
-    @IsNumber()
-    category?: number;
+    @IsDefined()
+    @Transform(({ value }) => new Category(value))
+    category: Category;
 
     @IsOptional()
     @IsString()

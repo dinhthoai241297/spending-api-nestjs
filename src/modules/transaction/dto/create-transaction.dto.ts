@@ -1,22 +1,24 @@
 import { Transform } from 'class-transformer';
-import { IsDateString, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsDate, IsDefined, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { MoneyMovement, TransactionPeriod, TransactionType } from 'src/constants';
+import { Category } from 'src/modules/category/entities/category.entity';
 
 export class CreateTransactionDto {
     @IsNotEmpty()
     @Transform(({ value }) => new Date(value))
-    @IsDateString()
+    @IsDate()
     date: Date;
 
+    @IsOptional()
     @IsString()
     note: string;
 
     @IsNumber()
     amount: number;
 
-    @IsNumber()
-    @IsNotEmpty()
-    categoryId: number;
+    @Transform(({ value }) => new Category(value))
+    @IsDefined()
+    category: Category;
 
     @IsString()
     money_movement: string;

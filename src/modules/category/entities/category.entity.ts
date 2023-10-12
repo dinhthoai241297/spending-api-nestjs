@@ -17,4 +17,8 @@ export class Category {
     @ManyToOne(type => Category, { nullable: true })
     @JoinColumn({ name: 'parent_id' })
     parent: Category;
+
+    constructor (id: number) {
+        this.id = id;
+    }
 }
