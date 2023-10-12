@@ -19,3 +19,8 @@ export enum MoneyMovement {
     IN = 'IN',
     OUT = 'OUT',
 }
+
+export enum EOrder {
+    ASC = 'ASC',
+    DESC = 'DESC',
+}

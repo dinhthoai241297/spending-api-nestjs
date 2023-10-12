@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { ApiMessagedto } from 'src/dto/api-message.dto';
+import { ApiMessagedto } from 'src/common/dto/api-message.dto';
 import { BaseController } from '../base.controller';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto, createCategoryDtoExample } from './dto/create-category.dto';

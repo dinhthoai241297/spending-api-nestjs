@@ -1,8 +1,9 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ApiMessagedto } from 'src/dto/api-message.dto';
+import { ApiMessagedto } from 'src/common/dto/api-message.dto';
 import { BaseController } from '../base.controller';
 import { CreateTransactionDto, createTransactionDtoExample } from './dto/create-transaction.dto';
+import { TransactionCriteriaDto } from './dto/transaction.criteria.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { Transaction } from './entities/transaction.entity';
 import { TransactionService } from './transaction.service';
@@ -26,33 +27,12 @@ export class TransactionController extends BaseController {
     @Get()
     @ApiOperation({ summary: 'Get transactions with optional query parameters' })
     @ApiResponse({ status: 200, description: 'Returns transactions based on query parameters' })
-    @ApiQuery({ name: 'startDate', required: false, type: String })
-    @ApiQuery({ name: 'endDate', required: false, type: String })
-    @ApiQuery({ name: 'money_movement', required: false, type: String })
-    @ApiQuery({ name: 'tx_period', required: false, type: String })
-    @ApiQuery({ name: 'tx_type', required: false, type: String })
-    @ApiQuery({ name: 'page', required: false, type: Number })
-    @ApiQuery({ name: 'size', required: false, type: Number })
     async findAll(
-        @Query('startDate') startDate?: string,
-        @Query('endDate') endDate?: string,
-        @Query('money_movement') moneyMovement?: string,
-        @Query('tx_period') txPeriod?: string,
-        @Query('tx_type') txType?: string,
-        @Query('page') page = 0,
-        @Query('size') size = 12,
+        @Query() criteria: TransactionCriteriaDto,
     ): Promise<ApiMessagedto<Transaction>> {
-        const [ content, total ] = await this.transactionService.findAll({
-            startDate,
-            endDate,
-            moneyMovement,
-            txPeriod,
-            txType,
-            page,
-            size,
-        });
+        const [content, total] = await this.transactionService.findAll(criteria);
 
-        return this.makeResponse('Get list transaction success!', content);
+        return this.makeResponse('Get list transaction success!', this.makeList(content, total, criteria));
     }
 
     @Get(':id')
@@ -66,7 +46,6 @@ export class TransactionController extends BaseController {
     @ApiBody({
         type: UpdateTransactionDto,
     })
-    @UsePipes(ValidationPipe)
     async update(@Param('id') id: string, @Body() updateTransactionDto: UpdateTransactionDto): Promise<Transaction> {
         return await this.transactionService.update(Number(id), updateTransactionDto);
     }

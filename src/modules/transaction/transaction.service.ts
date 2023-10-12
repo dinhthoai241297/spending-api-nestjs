@@ -2,8 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
 import { paginationData } from 'src/utils';
-import { Between, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
+import { Between, LessThanOrEqual, Like, MoreThanOrEqual, Repository } from 'typeorm';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
+import { TransactionCriteriaDto } from './dto/transaction.criteria.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { Transaction } from './entities/transaction.entity';
 
@@ -19,33 +20,36 @@ export class TransactionService {
         return await this.transactionRepository.save(transaction);
     }
 
-    async findAll(filters: {
-        startDate?: string;
-        endDate?: string;
-        moneyMovement?: string;
-        txPeriod?: string;
-        txType?: string;
-        page?: number;
-        size?: number;
-    }): Promise<[Transaction[], number]> {
+    async findAll({
+        start_date,
+        end_date,
+        money_movement,
+        tx_period,
+        tx_type,
+        note,
+        page,
+        size,
+    }: TransactionCriteriaDto): Promise<[Transaction[], number]> {
         let filterDate;
 
-        if (filters.startDate && filters.endDate) {
-            filterDate = Between(new Date(filters.startDate), new Date(filters.endDate));
-        } else if (filters.startDate) {
-            filterDate = MoreThanOrEqual(new Date(filters.startDate));
-        } else if (filters.endDate) {
-            filterDate = LessThanOrEqual(new Date(filters.endDate));
+        if (start_date && end_date) {
+            filterDate = Between(new Date(start_date), new Date(end_date));
+        } else if (start_date) {
+            filterDate = MoreThanOrEqual(new Date(start_date));
+        } else if (end_date) {
+            filterDate = LessThanOrEqual(new Date(end_date));
         }
 
         return await this.transactionRepository.findAndCount({
             where: {
                 date: filterDate,
-                money_movement: filters.moneyMovement,
-                tx_period: filters.txPeriod,
-                tx_type: filters.txType,
+                money_movement,
+                tx_period,
+                tx_type,
+                note: note ? Like(`%${note}%`) : undefined,
             },
-            ...paginationData(filters.page, filters.size)
+            relations: [ 'category' ],
+            ...paginationData(page, size)
         });
     }
 
