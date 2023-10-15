@@ -14,4 +14,6 @@ export class TransactionCriteriaDto extends PageOptionsDto {
     readonly end_date?: string;
     @StringFieldOptional()
     readonly note?: string;
+    @StringFieldOptional()
+    readonly category?: string;
 }

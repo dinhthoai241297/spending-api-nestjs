@@ -29,6 +29,7 @@ export class TransactionService {
         note,
         page,
         size,
+        category,
     }: TransactionCriteriaDto): Promise<[Transaction[], number]> {
         let filterDate;
 
@@ -47,6 +48,12 @@ export class TransactionService {
                 tx_period,
                 tx_type,
                 note: note ? Like(`%${note}%`) : undefined,
+                category: {
+                    id: category ? +category : undefined,
+                },
+            },
+            order: {
+                date: 'DESC',
             },
             relations: [ 'category' ],
             ...paginationData(page, size)
