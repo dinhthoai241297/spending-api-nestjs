@@ -55,13 +55,13 @@ export class TransactionService {
             order: {
                 date: 'DESC',
             },
-            relations: [ 'category' ],
+            relations: ['category'],
             ...paginationData(page, size)
         });
     }
 
     async findOne(id: number): Promise<Transaction> {
-        return await this.transactionRepository.findOne({ where: { id }, relations: [ 'category' ] });
+        return await this.transactionRepository.findOne({ where: { id }, relations: ['category'] });
     }
 
     async update(id: number, updateTransactionDto: UpdateTransactionDto): Promise<Transaction> {
@@ -81,5 +81,25 @@ export class TransactionService {
 
     async remove(id: number): Promise<void> {
         await this.transactionRepository.delete(id);
+    }
+
+    async getSummaryAmount({ startDate, endDate }: any): Promise<any> {
+        const queryBuilder = this.transactionRepository
+            .createQueryBuilder('transaction')
+            .leftJoinAndSelect('transaction.category', 'category')
+            .select('transaction.money_movement, category.id as categoryId, category.name as categoryName, transaction.tx_type, SUM(transaction.amount) as total')
+            .groupBy('transaction.money_movement, category.id, transaction.tx_type');
+
+        if (startDate) {
+            queryBuilder.andWhere('transaction.date >= :startDate', { startDate: new Date(startDate) });
+        }
+
+        if (endDate) {
+            queryBuilder.andWhere('transaction.date <= :endDate', { endDate: new Date(endDate) });
+        }
+
+        const result = await queryBuilder.getRawMany();
+
+        return result;
     }
 }

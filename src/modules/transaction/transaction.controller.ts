@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApiMessagedto } from 'src/common/dto/api-message.dto';
 import { BaseController } from '../base.controller';
@@ -35,6 +35,20 @@ export class TransactionController extends BaseController {
         return this.makeResponse('Get list transaction success!', this.makeList(content, total, criteria));
     }
 
+    @Get('/summary-amount')
+    @ApiOperation({ summary: 'Get transactions with optional query parameters' })
+    @ApiResponse({ status: 200, description: 'Returns transactions based on query parameters' })
+    @ApiQuery({ name: 'start-date', required: false })
+    @ApiQuery({ name: 'end-date', required: false })
+    async getSummaryAmount(
+        @Query("start-date") startDate?: string,
+        @Query("end-date") endDate?: string,
+    ): Promise<ApiMessagedto<any>> {
+        const result = await this.transactionService.getSummaryAmount({ startDate, endDate });
+
+        return this.makeResponse('Get list transaction success!', result);
+    }
+
     @Get(':id')
     async findOne(@Param('id') id: string): Promise<ApiMessagedto<Transaction>> {
         return this.makeResponse('', await this.transactionService.findOne(Number(id)));
@@ -52,6 +66,6 @@ export class TransactionController extends BaseController {
 
     @Delete(':id')
     async remove(@Param('id') id: string): Promise<void> {
-        await this.transactionService.remove(Number(id));
+        return await this.transactionService.remove(Number(id));
     }
 }
